@@ -243,21 +243,20 @@ export default function MockBracketScroll() {
         scrollTrigger: {
           trigger: ".bracket-scroll-section",
           start: "top top",
-          end: "+=3000",
+          end: "+=3500",
           pin: true,
-          scrub: 1,
-          // markers: false,
+          scrub: 0.5,
         },
         defaults: { ease: "power2.inOut" },
       });
 
-      /* ── Phase 1 (0 → 0.3): Bracket zoom-in + QF cards stagger ── */
+      /* ── Phase 1 (0 → 0.2): Bracket zoom-in + QF cards stagger ── */
 
       // Scale the entire bracket container up
       tl.fromTo(
         ".bracket-wrapper",
         { scale: 0.65, autoAlpha: 0.3 },
-        { scale: 1, autoAlpha: 1, duration: 0.3, ease: "power3.out" },
+        { scale: 1, autoAlpha: 1, duration: 0.2, ease: "power3.out" },
         0
       );
 
@@ -267,14 +266,24 @@ export default function MockBracketScroll() {
         {
           y: 40,
           autoAlpha: 0,
-          duration: 0.2,
-          stagger: 0.04,
+          duration: 0.15,
+          stagger: 0.03,
           ease: "power2.out",
         },
-        0.05
+        0.03
       );
 
-      /* ── Phase 2 (0.3 → 0.7): SVG draw-on + SF cards + pan left ── */
+      // Scroll hint fades out early
+      tl.to(
+        ".scroll-hint",
+        {
+          autoAlpha: 0,
+          duration: 0.08,
+        },
+        0.1
+      );
+
+      /* ── Phase 2 (0.18 → 0.45): SVG draw-on + SF cards + pan left ── */
 
       // Draw SVG connection paths (QF → SF)
       const qfPaths = paths.slice(0, 4);
@@ -283,13 +292,24 @@ export default function MockBracketScroll() {
           qfPaths,
           {
             strokeDashoffset: 0,
-            duration: 0.15,
-            stagger: 0.03,
+            duration: 0.12,
+            stagger: 0.02,
             ease: "none",
           },
-          0.3
+          0.18
         );
       }
+
+      // Pan the bracket left to reveal later rounds
+      tl.to(
+        ".bracket-wrapper",
+        {
+          x: -80,
+          duration: 0.35,
+          ease: "power1.inOut",
+        },
+        0.2
+      );
 
       // SF cards slide in from right
       tl.from(
@@ -297,11 +317,11 @@ export default function MockBracketScroll() {
         {
           x: 60,
           autoAlpha: 0,
-          duration: 0.15,
-          stagger: 0.04,
+          duration: 0.12,
+          stagger: 0.03,
           ease: "power2.out",
         },
-        0.4
+        0.28
       );
 
       // Draw SVG connection paths (SF → Final)
@@ -311,26 +331,15 @@ export default function MockBracketScroll() {
           sfPaths,
           {
             strokeDashoffset: 0,
-            duration: 0.15,
-            stagger: 0.03,
+            duration: 0.1,
+            stagger: 0.02,
             ease: "none",
           },
-          0.5
+          0.38
         );
       }
 
-      // Pan the bracket left to reveal later rounds
-      tl.to(
-        ".bracket-wrapper",
-        {
-          x: -80,
-          duration: 0.4,
-          ease: "power1.inOut",
-        },
-        0.3
-      );
-
-      /* ── Phase 3 (0.7 → 1.0): Final card spotlight ── */
+      /* ── Phase 3 (0.45 → 0.7): Final card spotlight ── */
 
       // Final card fades in and scales up
       tl.from(
@@ -338,20 +347,20 @@ export default function MockBracketScroll() {
         {
           autoAlpha: 0,
           scale: 0.9,
-          duration: 0.12,
+          duration: 0.1,
           ease: "power2.out",
         },
-        0.65
+        0.45
       );
 
       tl.to(
         ".match-card-f",
         {
           scale: 1.05,
-          duration: 0.15,
+          duration: 0.1,
           ease: "power2.out",
         },
-        0.75
+        0.53
       );
 
       // Glow pulse behind the final card
@@ -361,10 +370,10 @@ export default function MockBracketScroll() {
         {
           autoAlpha: 1,
           scale: 1.2,
-          duration: 0.2,
+          duration: 0.12,
           ease: "power2.out",
         },
-        0.75
+        0.53
       );
 
       // CAMPEÓN label
@@ -373,20 +382,10 @@ export default function MockBracketScroll() {
         {
           y: 20,
           autoAlpha: 0,
-          duration: 0.12,
+          duration: 0.1,
           ease: "power2.out",
         },
-        0.85
-      );
-
-      // Scroll hint fades out during animation
-      tl.to(
-        ".scroll-hint",
-        {
-          autoAlpha: 0,
-          duration: 0.1,
-        },
-        0.15
+        0.6
       );
     },
     { scope: containerRef }
