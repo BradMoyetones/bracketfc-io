@@ -181,7 +181,7 @@ function MatchCard({ match }: { match: Match }) {
     <div
       className={`match-card match-card-${match.round.toLowerCase()} absolute w-[300px] select-none rounded-xl border bg-surface-elevated ${
         isFinal
-          ? "border-accent-green/30 shadow-[0_0_30px_oklch(0.72_0.19_142_/_0.1)]"
+          ? "border-accent-green/30 shadow-[0_0_30px_oklch(0.72_0.19_142/0.1)]"
           : "border-glass-border"
       }`}
       style={{
@@ -191,7 +191,7 @@ function MatchCard({ match }: { match: Match }) {
       }}
     >
       {/* Subtle inner highlight */}
-      <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-b from-white/[0.03] to-transparent" />
+      <div className="pointer-events-none absolute inset-0 rounded-xl bg-linear-to-b from-white/3 to-transparent" />
 
       {/* Round label */}
       <div className="absolute -top-5 left-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground/50">
@@ -228,7 +228,7 @@ export default function MockBracketScroll() {
 
   useGSAP(
     () => {
-      // ── Measure path lengths and set up strokeDasharray ──
+      // ── Measure path lengths for draw-on effect ──
       const paths = pathRefs.current.filter(Boolean) as SVGPathElement[];
       paths.forEach((path) => {
         const length = path.getTotalLength();
@@ -239,153 +239,134 @@ export default function MockBracketScroll() {
       });
 
       // ── Master timeline ──
+      // No pin — Lenis conflicts with ScrollTrigger pinning.
+      // Animations play progressively as the section scrolls into view.
+      // start: section top enters viewport → end: section center hits viewport center
+      // = all animations complete by the time the bracket is half visible.
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: ".bracket-scroll-section",
-          start: "top top",
-          end: "+=3500",
-          pin: true,
-          scrub: 0.5,
+          trigger: containerRef.current,
+          start: "top bottom",
+          end: "center center",
+          scrub: true,
         },
-        defaults: { ease: "power2.inOut" },
       });
 
-      /* ── Phase 1 (0 → 0.2): Bracket zoom-in + QF cards stagger ── */
+      /* ── Phase 1: Bracket fades in + QF cards ── */
 
-      // Scale the entire bracket container up
       tl.fromTo(
         ".bracket-wrapper",
-        { scale: 0.65, autoAlpha: 0.3 },
-        { scale: 1, autoAlpha: 1, duration: 0.2, ease: "power3.out" },
+        { scale: 0.8, autoAlpha: 0 },
+        { scale: 1, autoAlpha: 1, duration: 0.4, ease: "power2.out" },
         0
       );
 
-      // QF cards stagger in
       tl.from(
         ".match-card-qf",
         {
-          y: 40,
+          y: 25,
           autoAlpha: 0,
-          duration: 0.15,
-          stagger: 0.03,
+          duration: 0.3,
+          stagger: 0.06,
           ease: "power2.out",
-        },
-        0.03
-      );
-
-      // Scroll hint fades out early
-      tl.to(
-        ".scroll-hint",
-        {
-          autoAlpha: 0,
-          duration: 0.08,
         },
         0.1
       );
 
-      /* ── Phase 2 (0.18 → 0.45): SVG draw-on + SF cards + pan left ── */
+      /* ── Phase 2: QF→SF paths draw + SF cards + pan ── */
 
-      // Draw SVG connection paths (QF → SF)
       const qfPaths = paths.slice(0, 4);
       if (qfPaths.length > 0) {
         tl.to(
           qfPaths,
           {
             strokeDashoffset: 0,
-            duration: 0.12,
-            stagger: 0.02,
+            duration: 0.25,
+            stagger: 0.04,
             ease: "none",
           },
-          0.18
+          0.35
         );
       }
 
-      // Pan the bracket left to reveal later rounds
       tl.to(
         ".bracket-wrapper",
-        {
-          x: -80,
-          duration: 0.35,
-          ease: "power1.inOut",
-        },
-        0.2
+        { x: -60, duration: 0.5, ease: "power1.inOut" },
+        0.4
       );
 
-      // SF cards slide in from right
       tl.from(
         ".match-card-sf",
         {
-          x: 60,
+          x: 40,
           autoAlpha: 0,
-          duration: 0.12,
-          stagger: 0.03,
+          duration: 0.25,
+          stagger: 0.06,
           ease: "power2.out",
         },
-        0.28
+        0.5
       );
 
-      // Draw SVG connection paths (SF → Final)
+      /* ── Phase 3: SF→Final paths + Final card + champion ── */
+
       const sfPaths = paths.slice(4, 6);
       if (sfPaths.length > 0) {
         tl.to(
           sfPaths,
           {
             strokeDashoffset: 0,
-            duration: 0.1,
-            stagger: 0.02,
+            duration: 0.2,
+            stagger: 0.04,
             ease: "none",
           },
-          0.38
+          0.7
         );
       }
 
-      /* ── Phase 3 (0.45 → 0.7): Final card spotlight ── */
-
-      // Final card fades in and scales up
       tl.from(
         ".match-card-f",
         {
           autoAlpha: 0,
-          scale: 0.9,
-          duration: 0.1,
+          scale: 0.85,
+          duration: 0.2,
           ease: "power2.out",
         },
-        0.45
+        0.8
       );
 
       tl.to(
         ".match-card-f",
         {
           scale: 1.05,
-          duration: 0.1,
+          duration: 0.15,
           ease: "power2.out",
         },
-        0.53
+        1.0
       );
 
-      // Glow pulse behind the final card
       tl.fromTo(
         ".final-glow",
         { autoAlpha: 0, scale: 0.8 },
-        {
-          autoAlpha: 1,
-          scale: 1.2,
-          duration: 0.12,
-          ease: "power2.out",
-        },
-        0.53
+        { autoAlpha: 1, scale: 1.2, duration: 0.2, ease: "power2.out" },
+        1.0
       );
 
-      // CAMPEÓN label
       tl.from(
         ".campeon-label",
         {
-          y: 20,
+          y: 15,
           autoAlpha: 0,
-          duration: 0.1,
+          duration: 0.2,
           ease: "power2.out",
         },
-        0.6
+        1.1
+      );
+
+      // Scroll hint fades out as animations progress
+      tl.to(
+        ".scroll-hint",
+        { autoAlpha: 0, duration: 0.15 },
+        0.3
       );
     },
     { scope: containerRef }
@@ -421,7 +402,7 @@ export default function MockBracketScroll() {
 
       {/* Bracket viewport */}
       <div
-        className="relative z-10 w-full max-w-[1100px] overflow-hidden"
+        className="relative z-10 w-full max-w-[1100px]"
         style={{ perspective: "1500px" }}
       >
         <div
@@ -500,7 +481,7 @@ export default function MockBracketScroll() {
       </p>
 
       {/* Mobile horizontal scroll hint overlay */}
-      <div className="pointer-events-none absolute right-0 top-1/2 z-20 hidden h-40 w-16 -translate-y-1/2 bg-gradient-to-l from-background to-transparent max-md:block" />
+      <div className="pointer-events-none absolute right-0 top-1/2 z-20 hidden h-40 w-16 -translate-y-1/2 bg-linear-to-l from-background to-transparent max-md:block" />
     </section>
   );
 }

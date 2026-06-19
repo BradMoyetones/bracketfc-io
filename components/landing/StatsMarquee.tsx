@@ -20,9 +20,9 @@ export default function StatsMarquee() {
   return (
     <section className="relative overflow-hidden border-y border-glass-border py-6">
       {/* Left fade */}
-      <div className="pointer-events-none absolute top-0 left-0 z-10 h-full w-24 bg-gradient-to-r from-background to-transparent" />
+      <div className="pointer-events-none absolute top-0 left-0 z-10 h-full w-24 bg-linear-to-r from-background to-transparent" />
       {/* Right fade */}
-      <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-24 bg-gradient-to-l from-background to-transparent" />
+      <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-24 bg-linear-to-l from-background to-transparent" />
 
       <div className="marquee-track">
         {items.map((stat, i) => (
