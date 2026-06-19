@@ -26,13 +26,33 @@ function XIcon({ className }: { className?: string }) {
   );
 }
 
+/** Inline Instagram SVG */
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  );
+}
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className="relative overflow-hidden border-t border-glass-border bg-background">
       {/* Accent top line */}
-      <div className="absolute top-0 left-1/2 h-px w-1/3 -translate-x-1/2 bg-gradient-to-r from-transparent via-accent-green/40 to-transparent" />
+      <div className="absolute top-0 left-1/2 h-px w-1/3 -translate-x-1/2 bg-linear-to-r from-transparent via-accent-green/40 to-transparent" />
 
       <div className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-3">
@@ -82,7 +102,7 @@ export default function Footer() {
             </span>
             <div className="flex items-center gap-4">
               <a
-                href="https://github.com"
+                href="https://github.com/BradMoyetones/bracketfc-io"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
@@ -91,13 +111,22 @@ export default function Footer() {
                 <GitHubIcon className="size-5" />
               </a>
               <a
-                href="https://x.com"
+                href="https://x.com/BradMoyetones"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="X (Twitter)"
                 className="text-muted-foreground transition-colors duration-200 hover:text-accent-green"
               >
                 <XIcon className="size-5" />
+              </a>
+              <a
+                href="https://instagram.com/its.bradn"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="text-muted-foreground transition-colors duration-200 hover:text-accent-green"
+              >
+                <InstagramIcon className="size-5" />
               </a>
             </div>
             <span className="mt-1 text-xs text-muted-foreground">
